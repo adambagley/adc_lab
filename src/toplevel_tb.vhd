@@ -62,6 +62,19 @@ begin
     wait for 10 us;
     -- TODO : in here, write some code to create PSEN signals which will rotate the the ADC_CLK a full 360 degrees from 
     -- its starting location.  Then stop rotating.
+    -- each increment is .0179ns, and one full period of the clock is 8ns, so (8/.0179)=448 increments needed
+    for i in 1 to 448 loop
+        wait until rising_edge(psclk);
+        PSEN <= '1';
+        wait until rising_edge(psclk);
+        PSEN <= '0';
+        wait_psdone: loop
+            wait until rising_edge(psclk);
+            if PSDONE = '1' then 
+                exit wait_psdone;
+            end if;
+        end loop wait_psdone;
+    end loop;
     wait; 
  end process;
 
